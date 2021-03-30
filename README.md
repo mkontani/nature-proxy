@@ -2,13 +2,18 @@
 
 - [irkit-proxy](#irkit-proxy)
   - [Setup](#setup)
+    - [Generate IRKit request payload](#generate-irkit-request-payload)
     - [Env setting](#env-setting)
     - [mapping setting](#mapping-setting)
+    - [IFTTT Action Setting](#ifttt-action-setting)
+      - [IF](#if)
+      - [THEN](#then)
   - [Run](#run)
     - [proxy example](#proxy-example)
   - [Request](#request)
 
-:loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller.
+:loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
+and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
 
 Use this proxy for below reasons:
 
@@ -28,6 +33,10 @@ IFTTT action is like below:
 so `GoogleHome` is especially suitable.
 
 ## Setup
+
+### Generate IRKit request payload
+
+See details: <https://getirkit.com/>
 
 ### Env setting
 
@@ -71,15 +80,51 @@ Set `mappings.json` like below:
 
 If all `words` are contained in request `phrase`, its correspond `payload` will be use.
 
+### IFTTT Action Setting
+
+#### IF
+
+Use `Say a phrase with both a number and a text ingredient` on `Google Assistant`.
+
+Set params for `What do you want to say?` like below:
+
+`IR $ for # times (IR $ を # 回)`
+
+Then, if you speak `ok google, IR Room light 3 times`, `IR Room light` is set to `$`
+and `3` is set to `#`.
+
+These params can be used in next then-action by using ingredient.
+
+#### THEN
+
+Use `Make a web request` on `webhook`.
+
+Set params like below:
+
+```:sh
+URL: https://<your apihost>/v1/api/irkit
+Method: POST
+Content-type: application/json
+Body: {"apikey": "<your defined value>", "phrase": " {{TextField}}", "repeat": {{NumberField}} }
+```
+
+`{{TextField}}` and `{{NumberField}}` are corresponded to `IR Room light` and `3` respectively on above example.
+
 ## Run
 
 ```:sh
+# local
+$ npm run serve
+
+################################ 
+
+# docker usecase
 $ docker build -t irkit-proxy .
 
-# proxy case
+## proxy case
 $ docker run -d -p 127.0.0.1:8000:8000 --restart always irkit-proxy
 
-# standalone case (set env USETLS=true)
+## standalone case (set env USETLS=true)
 $ docker run -d -p 443:443 --restart always irkit-proxy
 ```
 
@@ -113,4 +158,3 @@ server {
     -d '{"apikey": "xxxx", "phrase": "照明 を 明るく して", "repeat": 2}' \
     https://api.nicopun.com/v1/api/irkit
 ```
-
