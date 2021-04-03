@@ -10,7 +10,7 @@
       - [THEN](#then)
   - [Run](#run)
     - [proxy example](#proxy-example)
-  - [Request](#request)
+  - [Manual Request](#manual-request)
 
 :loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
@@ -29,7 +29,7 @@ IFTTT action is like below:
 <smart speaker device> ---> <this proxy api> ---> <irkit api>
 ```
 
-`Google Assistant` has ingredient util on ITFFF (speaking phrase can be used on next webhook),
+`Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
 
 ## Setup
@@ -48,7 +48,12 @@ Set `APIKEY` with any random value on `.env`.
 # mandatory
 APIKEY=xxxx
 
-# option (if use standalone ssl.)
+# option
+LOG_LEVEL=info (defult: `warn`)
+PORT=9999 (default: `8000`)
+CONF_PATH=/path/to/conf (default: `./mappings.json`)
+
+# option (for use standalone ssl.)
 USETLS=true
 KEY_PATH=./server.key
 CERT_PATH=./server.cert
@@ -151,7 +156,7 @@ server {
 }
 ```
 
-## Request
+## Manual Request
 
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \

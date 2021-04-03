@@ -5,6 +5,8 @@ const http = require("http");
 const https = require("https");
 const axios = require("axios");
 require("dotenv").config();
+const logger = require("log4js").getLogger();
+logger.level = process.env.LOG_LEVEL || "warn";
 
 const Serve = async (conf) => {
   let server;
@@ -28,11 +30,11 @@ const Serve = async (conf) => {
   const port = process.env.PORT || 8000;
   server.listen(port, () => {
     const schema = process.env.USETLS ? "HTTPS" : "HTTP";
-    console.log(`${schema} Server is listening on PORT ${port}`);
+    logger.info(`${schema} Server is listening on PORT ${port}`);
   });
 
   server.on("error", (e) => {
-    console.log(e);
+    logger.error(e);
     process.exit(1);
   });
 };
@@ -57,32 +59,33 @@ const apply = async (req, res, confmap) => {
       try {
         data = JSON.parse(data);
       } catch (e) {
-        console.log("unauthorized");
+        logger.warn("request params invalid", e);
         res.statusCode = 403;
-        res.end("unauthorized");
+        res.end("request params invalid");
         return;
       }
       if (data?.apikey !== process.env.APIKEY) {
-        console.log("unauthorized");
+        logger.warn("unauthorized");
         res.statusCode = 401;
         res.end("unauthorized");
         return;
       }
       const repeat = data?.repeat || 1;
 
-      const usemap = confmap.find((map) => {
-        return map.words.every((word) => String(data?.phrase).includes(word));
-      });
+      const usemap = confmap.find((map) =>
+        map.words.every((word) => String(data?.phrase).includes(word))
+      );
       if (!usemap?.payload) {
-        console.log("bad request", data);
+        logger.warn("correspond mapping is not defined", data);
         res.statusCode = 400;
-        res.end("specified phrase is not match");
+        res.end("correspond mapping is not defined");
         return;
       }
 
       let failtimes = 0;
       for (let i = 0; i < repeat; i++) {
         try {
+          logger.info(`request ${i + 1} of ${repeat}`);
           const resp = await axios({
             method: "post",
             url: "https://api.getirkit.com/1/messages",
@@ -92,34 +95,40 @@ const apply = async (req, res, confmap) => {
             },
           });
           if (resp.status === 200) {
-            console.log(`Accepted ${i + 1} times.`);
+            logger.info(`Accepted ${i + 1} times.`);
           } else {
-            console.log(resp);
+            logger.warn("request to irkit is failed", resp);
             failtimes++;
           }
         } catch {
           (e) => {
-            console.log(e);
+            logger.error(e);
             res.statusCode = 500;
-            res.end("internal server error");
+            res.end("request to irkit came to exception");
           };
         }
         await sleep(1000);
       }
       if (failtimes === repeat) {
+        logger.warn(`all request failed`);
         res.writeHead(400, { "content-type": "text/plain" });
-        res.end(`All request failed.`);
+        res.end(`all request failed.`);
         return;
       } else if (failtimes > 0) {
+        logger.warn(`request partially successed. FailTimes: ${failtimes}`);
         res.writeHead(200, { "content-type": "text/plain" });
-        res.end(`request partially failed. FailTimes: ${failtimes}`);
+        res.end(`request partially successed. FailTimes: ${failtimes}`);
         return;
       } else {
+        logger.info("all request successed.");
         res.writeHead(200, { "content-type": "text/plain" });
-        res.end("Accepted");
+        res.end("accepted");
         return;
       }
     } else {
+      logger.warn(
+        `reqeust path or method is invalid: Path: ${url.pathname}, method: ${req.method}`
+      );
       res.statusCode = 404;
       res.end("Not found");
       return;
@@ -127,5 +136,6 @@ const apply = async (req, res, confmap) => {
   });
 };
 
-const conf = require("./mappings.json");
+const confpath = process.env.CONF_PATH || "./mappings.json";
+const conf = require(confpath);
 Serve(conf);
