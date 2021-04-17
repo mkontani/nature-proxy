@@ -25,9 +25,17 @@ So by for now, IFTTT cannot send request to IRkit apis.
 
 IFTTT action is like below:
 
-```:sh
-<smart speaker device> ---> <this proxy api> ---> <irkit api>
+<!---
+```plantuml
+@startuml
+SmartSpeakerDevice -> ThisProxy: Webhook req
+ThisProxy -> IRKitAPI: API req
+IRKitAPI -> ThisProxy: result
+@enduml
 ```
+-->
+
+![README](https://www.plantuml.com/plantuml/svg/SoWkIImgAStDuGhE1JA22r8JirEBN5BBCfDJ5NJj548oCei3Yl8hAgqKmbEJClBpinMAKWkvuC8WDPv1tfabZW6ULWf00YmD4r7GHJMYABMuDAU4oo4rBmLe9G00 "README")
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
