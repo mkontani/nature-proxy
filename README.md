@@ -15,11 +15,10 @@
 :loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
 
-Use this proxy for below reasons:
+This proxy addresses following problems:
 
 - IRKit api does not support tlsv1.2, and IFTTT webhook now only supports tlsv1.2 and above.
 So by for now, IFTTT cannot send request to IRkit apis.
-
 - IFTTT free plan has became define only 3 custom actions.
 - IFTTT trigger cannot request multiple times all at once.
 
@@ -28,14 +27,18 @@ IFTTT action is like below:
 <!---
 ```plantuml
 @startuml
-SmartSpeakerDevice -> ThisProxy: Webhook req
-ThisProxy -> IRKitAPI: API req
-IRKitAPI -> ThisProxy: result
+SmartSpeakerDevice -> IFTTT: phrase(action and N times)
+IFTTT -> irkitproxy: webhook req
+group loop N times
+irkitproxy -> IRKitAPI: API req
+IRKitAPI -> irkitproxy: result
+end
+irkitproxy -> IFTTT: summary result
 @enduml
 ```
 -->
 
-![README](https://www.plantuml.com/plantuml/svg/SoWkIImgAStDuGhE1JA22r8JirEBN5BBCfDJ5NJj548oCei3Yl8hAgqKmbEJClBpinMAKWkvuC8WDPv1tfabZW6ULWf00YmD4r7GHJMYABMuDAU4oo4rBmLe9G00 "README")
+![README](http://www.plantuml.com/plantuml/svg/NO_12i8m38RlVOeSzU0Bx20JH1Y2YDiBr2sui7MfQQhkxQs38de98Np_bwGCQaMZ6qtjKbDxj0FA7X_K8cosK1sQfYd0zs83hcohn1FOgOCJA3aCQxCG7vHa8FN2hxc09rvxvW44x-Oc73sCp3w7p1TTTboEfBjpLK0gIoHF_hM28OvgSEf-5VdC49spCcUkJ61wxGq0)
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
@@ -103,7 +106,7 @@ Set params for `What do you want to say?` like below:
 
 `IR $ for # times (IR $ を # 回)`
 
-Then, if you speak `ok google, IR Room light 3 times`, `IR Room light` is set to `$`
+Then, if you speak `ok google, IR Room light 3 times`, `Room light` is set to `$`
 and `3` is set to `#`.
 
 These params can be used in next then-action by using ingredient.
@@ -121,7 +124,7 @@ Content-type: application/json
 Body: {"apikey": "<your defined value>", "phrase": " {{TextField}}", "repeat": {{NumberField}} }
 ```
 
-`{{TextField}}` and `{{NumberField}}` are corresponded to `IR Room light` and `3` respectively on above example.
+`{{TextField}}` and `{{NumberField}}` are corresponded to `Room light` and `3` respectively on above example.
 
 ## Run
 
