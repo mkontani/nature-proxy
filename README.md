@@ -37,11 +37,16 @@ irkitproxy -> IRKitAPI: API req
 IRKitAPI -> irkitproxy: result
 end
 irkitproxy -> IFTTT: summary result
+...
+group loop N times on schedule
+irkitproxy -> IRKitAPI: API req
+IRKitAPI -> irkitproxy: result
+end
 @enduml
 ```
 -->
 
-![README](http://www.plantuml.com/plantuml/svg/NO_12i8m38RlVOeSzU0Bx20JH1Y2YDiBr2sui7MfQQhkxQs38de98Np_bwGCQaMZ6qtjKbDxj0FA7X_K8cosK1sQfYd0zs83hcohn1FOgOCJA3aCQxCG7vHa8FN2hxc09rvxvW44x-Oc73sCp3w7p1TTTboEfBjpLK0gIoHF_hM28OvgSEf-5VdC49spCcUkJ61wxGq0)
+![README](http://www.plantuml.com/plantuml/svg/hOzD2i8m48NtESKiTM4Fq8LK4A488hONYErWGvDCd2HgRsyi155Skdc4yBsVgNoG7ABHeZ7fqJYK8_8MRwf3MAsXthLjMu8RM7fSo2ueiY1j3mS8og1VYfbueOf75HpJOohXZkU1Q0J6gxWmHGUQo6MJUADpnsclmkPObv1ajkIVxrX67tKGQFlFY3pJHvEkc39N5CMFTY0BlXkmZnh_iQHA4er-0W00)
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
