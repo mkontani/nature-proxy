@@ -22,8 +22,9 @@
   },
   "homepage": "https://github.com/mkontani/irkit-proxy/blob/master/README.md",
   "dependencies": {
-    "axios": "^0.21.1",
-    "dotenv": "^8.2.0",
+    "axios": "^0.24.0",
+    "cron": "^1.8.2",
+    "dotenv": "^10.0.0",
     "log4js": "^6.3.0"
   }
 }
