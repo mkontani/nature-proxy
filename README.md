@@ -11,6 +11,8 @@
   - [Run](#run)
     - [proxy example](#proxy-example)
   - [Manual Request](#manual-request)
+    - [request with id](#request-with-id)
+    - [request with phrase](#request-with-phrase)
 
 :loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
@@ -21,6 +23,7 @@ This proxy addresses following problems:
 So by for now, IFTTT cannot send request to IRkit apis.
 - IFTTT free plan has became define only 3 custom actions.
 - IFTTT trigger cannot request multiple times all at once.
+- schedule(cron) support.
 
 IFTTT action is like below:
 
@@ -194,6 +197,16 @@ server {
 ```
 
 ## Manual Request
+
+### request with id
+
+```:sh
+ᐅ curl -XPOST -H 'content-type: application/json' \
+    -d '{"apikey": "xxxx", "id": "turn-light", "repeat": 1}' \
+    https://api.nicopun.com/v1/api/irkit
+```
+
+### request with phrase
 
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \

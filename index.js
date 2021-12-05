@@ -82,7 +82,7 @@ const registerCron = async (c) => {
     if (rule) {
       new cron(
         schedule.cronTime,
-        async () => await request(rule.payload, schedule.repeat),
+        async () => await request(rule.payload, schedule.repeat || 1),
         null,
         true,
         schedule.timezone || process.env.TIME_ZONE
@@ -127,9 +127,14 @@ const apply = async (req, res, confmap) => {
       }
       const repeat = data?.repeat || 1;
 
-      const usemap = confmap.find((map) =>
-        map.words.every((word) => String(data?.phrase).includes(word))
-      );
+      let usemap;
+      if (data.id) {
+        usemap = confmap.find((map) => data.id === map.id);
+      } else {
+        usemap = confmap.find((map) =>
+          map.words.every((word) => String(data?.phrase).includes(word))
+        );
+      }
       if (!usemap?.payload) {
         logger.warn("correspond mapping is not defined", data);
         res.statusCode = 400;
