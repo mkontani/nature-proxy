@@ -11,6 +11,8 @@
   - [Run](#run)
     - [proxy example](#proxy-example)
   - [Manual Request](#manual-request)
+    - [request with id](#request-with-id)
+    - [request with phrase](#request-with-phrase)
 
 :loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
@@ -21,6 +23,7 @@ This proxy addresses following problems:
 So by for now, IFTTT cannot send request to IRkit apis.
 - IFTTT free plan has became define only 3 custom actions.
 - IFTTT trigger cannot request multiple times all at once.
+- schedule(cron) support.
 
 IFTTT action is like below:
 
@@ -34,11 +37,16 @@ irkitproxy -> IRKitAPI: API req
 IRKitAPI -> irkitproxy: result
 end
 irkitproxy -> IFTTT: summary result
+...
+group loop N times on schedule
+irkitproxy -> IRKitAPI: API req
+IRKitAPI -> irkitproxy: result
+end
 @enduml
 ```
 -->
 
-![README](http://www.plantuml.com/plantuml/svg/NO_12i8m38RlVOeSzU0Bx20JH1Y2YDiBr2sui7MfQQhkxQs38de98Np_bwGCQaMZ6qtjKbDxj0FA7X_K8cosK1sQfYd0zs83hcohn1FOgOCJA3aCQxCG7vHa8FN2hxc09rvxvW44x-Oc73sCp3w7p1TTTboEfBjpLK0gIoHF_hM28OvgSEf-5VdC49spCcUkJ61wxGq0)
+![README](http://www.plantuml.com/plantuml/svg/hOzD2i8m48NtESKiTM4Fq8LK4A488hONYErWGvDCd2HgRsyi155Skdc4yBsVgNoG7ABHeZ7fqJYK8_8MRwf3MAsXthLjMu8RM7fSo2ueiY1j3mS8og1VYfbueOf75HpJOohXZkU1Q0J6gxWmHGUQo6MJUADpnsclmkPObv1ajkIVxrX67tKGQFlFY3pJHvEkc39N5CMFTY0BlXkmZnh_iQHA4er-0W00)
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
@@ -69,6 +77,7 @@ USETLS=true
 KEY_PATH=./server.key
 CERT_PATH=./server.cert
 PORT=443
+TIME_ZONE=Asia/Tokyo
 ```
 
 ### mapping setting
@@ -78,23 +87,48 @@ We should define mappings for `phrase` and `IRkit request payload`.
 Set `mappings.json` like below:
 
 ```:json
-[
+{
+  "rules": [
     {
-        "words": ["照明", "つけて"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-light",
+      "words": [
+        "照明",
+        "つけて"
+      ],
+      "payload": "clientkey=xxxx&deviceid=xxxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[20691,10398,...]}"
     },
     {
-        "words": ["照明", "明るく"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-up",
+      "words": [
+        "照明",
+        "明るく"
+      ],
+      "payload": "test1"
     },
     {
-        "words": ["照明", "暗く"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-down",
+      "words": [
+        "照明",
+        "暗く"
+      ],
+      "payload": "test2"
     }
-]
+  ],
+  "schedules": [
+    {
+      "cronTime": "0 0 0 * * *",
+      "timezone": "Asia/Tokyo",
+      "ruleId": "turn-light",
+      "repeat": 1
+    }
+  ]
+}
+
 ```
 
-If all `words` are contained in request `phrase`, its correspond `payload` will be use.
+In `rules` section, if all `words` are contained in request `phrase`, its correspond `payload` will be use.
+
+In `schedules` section, you can define schedules for rules correspond to `ruleId`. This section is Optional.
 
 ### IFTTT Action Setting
 
@@ -168,6 +202,16 @@ server {
 ```
 
 ## Manual Request
+
+### request with id
+
+```:sh
+ᐅ curl -XPOST -H 'content-type: application/json' \
+    -d '{"apikey": "xxxx", "id": "turn-light", "repeat": 1}' \
+    https://api.nicopun.com/v1/api/irkit
+```
+
+### request with phrase
 
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \
