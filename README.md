@@ -69,6 +69,7 @@ USETLS=true
 KEY_PATH=./server.key
 CERT_PATH=./server.cert
 PORT=443
+TIME_ZONE=Asia/Tokyo
 ```
 
 ### mapping setting
@@ -78,23 +79,48 @@ We should define mappings for `phrase` and `IRkit request payload`.
 Set `mappings.json` like below:
 
 ```:json
-[
+{
+  "rules": [
     {
-        "words": ["照明", "つけて"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-light",
+      "words": [
+        "照明",
+        "つけて"
+      ],
+      "payload": "clientkey=xxxx&deviceid=xxxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[20691,10398,...]}"
     },
     {
-        "words": ["照明", "明るく"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-up",
+      "words": [
+        "照明",
+        "明るく"
+      ],
+      "payload": "test1"
     },
     {
-        "words": ["照明", "暗く"],
-        "payload": "clientkey=xxx&deviceid=xxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[999,999]}"
+      "id": "turn-down",
+      "words": [
+        "照明",
+        "暗く"
+      ],
+      "payload": "test2"
     }
-]
+  ],
+  "schedules": [
+    {
+      "cronTime": "0 0 0 * * *",
+      "timezone": "Asia/Tokyo",
+      "ruleId": "turn-light",
+      "repeat": 1
+    }
+  ]
+}
+
 ```
 
-If all `words` are contained in request `phrase`, its correspond `payload` will be use.
+In `rules` section, if all `words` are contained in request `phrase`, its correspond `payload` will be use.
+
+In `schedules` section, you can define schedules for rules correspond to `ruleId`. This section is Optional.
 
 ### IFTTT Action Setting
 
