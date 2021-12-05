@@ -49,7 +49,7 @@ jobs:
           # VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           # [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          VERSION=$(git describe --tags --abbrev=0 | sed -e 's/^v//')
+          VERSION=$(curl https://api.github.com/repos/${{ github.repository }}/tags | jq '.[0].name' | sed -e 's/^v//')
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
