@@ -1,18 +1,24 @@
 # irkit-proxy
 
+[![DockerCI][docker-badge]][docker-ci]
+
+[docker-badge]: https://github.com/mkontani/irkit-proxy/workflows/Docker%20Image%20CI/badge.svg
+[docker-ci]: https://github.com/mkontani/irkit-proxy/actions/workflows/docker-image.yml
+
 - [irkit-proxy](#irkit-proxy)
   - [Setup](#setup)
     - [Generate IRKit request payload](#generate-irkit-request-payload)
     - [Env setting](#env-setting)
-    - [mapping setting](#mapping-setting)
+    - [Config setting](#config-setting)
     - [IFTTT Action Setting](#ifttt-action-setting)
       - [IF](#if)
       - [THEN](#then)
   - [Run](#run)
-    - [proxy example](#proxy-example)
+  - [Build](#build)
+    - [Proxy example](#proxy-example)
   - [Manual Request](#manual-request)
-    - [request with id](#request-with-id)
-    - [request with phrase](#request-with-phrase)
+    - [Request with id](#request-with-id)
+    - [Request with phrase](#request-with-phrase)
 
 :loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
@@ -46,7 +52,7 @@ end
 ```
 -->
 
-![README](http://www.plantuml.com/plantuml/svg/hOzD2i8m48NtESKiTM4Fq8LK4A488hONYErWGvDCd2HgRsyi155Skdc4yBsVgNoG7ABHeZ7fqJYK8_8MRwf3MAsXthLjMu8RM7fSo2ueiY1j3mS8og1VYfbueOf75HpJOohXZkU1Q0J6gxWmHGUQo6MJUADpnsclmkPObv1ajkIVxrX67tKGQFlFY3pJHvEkc39N5CMFTY0BlXkmZnh_iQHA4er-0W00)
+![image](https://www.plantuml.com/plantuml/svg/hOzD2i8m48NtESKiTM4Fq8LK4A488hONYErWGvDCd2HgRsyi155Skdc4yBsVgNoG7ABHeZ7fqJYK8_8MRwf3MAsXthLjMu8RM7fSo2ueiY1j3mS8og1VYfbueOf75HpJOohXZkU1Q0J6gxWmHGUQo6MJUADpnsclmkPObv1ajkIVxrX67tKGQFlFY3pJHvEkc39N5CMFTY0BlXkmZnh_iQHA4er-0W00)
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
@@ -80,7 +86,7 @@ PORT=443
 TIME_ZONE=Asia/Tokyo
 ```
 
-### mapping setting
+### Config setting
 
 We should define mappings for `phrase` and `IRkit request payload`.
 
@@ -164,10 +170,21 @@ Body: {"apikey": "<your defined value>", "phrase": " {{TextField}}", "repeat": {
 
 ```:sh
 # local
+$ npm ci
 $ npm run serve
 
 ################################ 
 
+# Run with docker
+$ docker run -d -p 127.0.0.1:8000:8000 --restart always \
+    -v $PWD/mappings.json:/app/mappings.json \
+    -v $PWD/.env:/app/.env \
+    ghcr.io/mkontani/irkit-proxy:latest
+```
+
+## Build
+
+```sh
 # docker usecase
 $ docker build -t irkit-proxy .
 
@@ -178,7 +195,7 @@ $ docker run -d -p 127.0.0.1:8000:8000 --restart always irkit-proxy
 $ docker run -d -p 443:443 --restart always irkit-proxy
 ```
 
-### proxy example
+### Proxy example
 
 nginx(openresty) settings:
 
@@ -203,7 +220,7 @@ server {
 
 ## Manual Request
 
-### request with id
+### Request with id
 
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \
@@ -211,7 +228,7 @@ server {
     https://api.nicopun.com/v1/api/irkit
 ```
 
-### request with phrase
+### Request with phrase
 
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \

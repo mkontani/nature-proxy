@@ -1,8 +1,6 @@
 "use strict";
 
 const fs = require("fs");
-const http = require("http");
-const https = require("https");
 const axios = require("axios");
 require("dotenv").config();
 const logger = require("log4js").getLogger();
@@ -15,7 +13,7 @@ const Serve = async (conf) => {
   // server proc
   let server;
   if (process.env.USETLS) {
-    server = https.createServer(
+    server = require("https").createServer(
       {
         key: fs.readFileSync(process.env.KEY_PATH),
         cert: fs.readFileSync(process.env.CERT_PATH),
@@ -26,7 +24,7 @@ const Serve = async (conf) => {
       }
     );
   } else {
-    server = http.createServer(async (req, res) => {
+    server = require("http").createServer(async (req, res) => {
       req.protocol = "http";
       await apply(req, res, conf?.rules);
     });
