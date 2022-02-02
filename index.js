@@ -53,7 +53,7 @@ const request = async (payload, repeat) => {
         url: "https://api.getirkit.com/1/messages",
         data: payload,
         headers: {
-          "content-type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       });
       if (resp.status === 200) {
@@ -100,11 +100,31 @@ const apply = async (req, res, confmap) => {
     data += chunk;
   });
   req.on("end", async () => {
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      process.env.ACCESS_CONTROL_ALLOW_HEADERS || "*"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      process.env.ACCESS_CONTROL_ALLOW_ORIGIN || "*"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      process.env.ACCESS_CONTROL_ALLOW_METHODS || "*"
+    );
+    if (process.env.ACCESS_CONTROL_ALLOW_CREDENTIALS)
+      res.setHeader("Access-Control-Allow-Credentials", true);
     const url = new URL(req.url, `${req.protocol}://${req.headers.host}`);
     // healthcheck ep
     if (url.pathname === "/status" && req.method === "GET") {
       res.statusCode = 200;
       res.end("ok");
+      return;
+    }
+    // pre flight
+    else if (url.pathname === "/v1/api/irkit" && req.method === "OPTIONS") {
+      res.statusCode = 200;
+      res.end();
       return;
     }
     // api endpoint
@@ -113,13 +133,13 @@ const apply = async (req, res, confmap) => {
         data = JSON.parse(data);
       } catch (e) {
         logger.warn("request params invalid", e);
-        res.statusCode = 403;
+        res.statusCode = 400;
         res.end("request params invalid");
         return;
       }
       if (data?.apikey !== process.env.APIKEY) {
         logger.warn("unauthorized");
-        res.statusCode = 401;
+        res.statusCode = 403;
         res.end("unauthorized");
         return;
       }
