@@ -78,6 +78,12 @@ LOG_LEVEL=info (defult: `warn`)
 PORT=9999 (default: `8000`)
 CONF_PATH=/path/to/conf (default: `./mappings.json`)
 
+# option (for preflight)
+ACCESS_CONTROL_ALLOW_ORIGIN=https://example.com (default: *)
+ACCESS_CONTROL_ALLOW_HEADERS=X-TOKEN (default: *)
+ACCESS_CONTROL_ALLOW_METHODS=POST (default: *)
+ACCESS_CONTROL_ALLOW_CREDENTIALS=true (default: unset)
+
 # option (for use standalone ssl.)
 USETLS=true
 KEY_PATH=./server.key
