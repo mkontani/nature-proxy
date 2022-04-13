@@ -45,15 +45,23 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          # VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          # [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          VERSION=$(curl https://api.github.com/repos/${{ github.repository }}/tags | jq -r '.[0].name' | sed -e 's/^v//')
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+
+          NEW_VERSION=$(jq -r .version package.json)
+          CUR_VERSION=$(curl https://api.github.com/repos/${{ github.repository }}/tags | jq -r '.[0].name' | sed -e 's/^v//')
+          if [[ "$NEW_VERSION" != "$CUR_VERSION" ]]; then
+            # generate new release 
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github.v3+json" \
+              https://api.github.com/repos/${ github.repository }/releases \
+              -d "{\"tag_name\":\"v${NEW_VERSION}\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":true}"
+
+            # publish tagged image
+            echo IMAGE_ID=$IMAGE_ID
+            echo VERSION=$NEW_VERSION
+            docker tag $IMAGE_NAME $IMAGE_ID:$NEW_VERSION
+            docker push $IMAGE_ID:$NEW_VERSION
+          fi
           
           # Use Docker `latest` tag convention
           echo IMAGE_ID=$IMAGE_ID
