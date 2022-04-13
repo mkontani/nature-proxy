@@ -54,7 +54,7 @@ jobs:
               -v -X POST \
               -H "Accept: application/vnd.github.v3+json" \
               https://api.github.com/repos/${{ github.repository }}/releases \
-              -d "{\"tag_name\":\"v$NEW_VERSION\",\"draft\":false,\"prerelease\":false}"
+              -d "{\"tag_name\":\"v$NEW_VERSION\",\"name\":\"v$NEW_VERSION\",\"body\":\"test\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":true}"
 
             # publish tagged image
             echo IMAGE_ID=$IMAGE_ID
