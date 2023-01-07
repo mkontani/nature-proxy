@@ -15,7 +15,6 @@
       - [THEN](#then)
   - [Run](#run)
   - [Build](#build)
-    - [Proxy example](#proxy-example)
   - [Manual Request](#manual-request)
     - [Request with id](#request-with-id)
     - [Request with phrase](#request-with-phrase)
@@ -96,7 +95,7 @@ TIME_ZONE=Asia/Tokyo
 
 ### Config setting
 
-We should define mappings for `phrase` and `nature request payload`.
+We should define mappings for `type` and `id`.
 
 Set `mappings.json` like below:
 
@@ -104,28 +103,23 @@ Set `mappings.json` like below:
 {
   "rules": [
     {
+      "type": "appliance:LIGHT",
       "id": "turn-light",
+      "appliance_id": "xxxx-xxxx-xxxx-xxxx-xxxxx",
       "words": [
         "照明",
         "つけて"
       ],
-      "payload": "clientkey=xxxx&deviceid=xxxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[20691,10398,...]}"
+      "payload": "button=onoff"
     },
     {
-      "id": "turn-up",
+      "type": "signal",
+      "id": "turn-planetarium",
+      "signal_id": "xxxx-xxxx-xxxx-xxxx-xxxxx",
       "words": [
-        "照明",
-        "明るく"
-      ],
-      "payload": "test1"
-    },
-    {
-      "id": "turn-down",
-      "words": [
-        "照明",
-        "暗く"
-      ],
-      "payload": "test2"
+        "プラネタリウム",
+        "電源"
+      ]
     }
   ],
   "schedules": [
@@ -201,29 +195,6 @@ $ docker run -d -p 127.0.0.1:8000:8000 --restart always nature-proxy
 
 ## standalone case (set env USETLS=true)
 $ docker run -d -p 443:443 --restart always nature-proxy
-```
-
-### Proxy example
-
-nginx(openresty) settings:
-
-```:sh
-server {
-    listen 443 ssl;
-    server_name api.nicopun.com;
-
-    # fallback certs, make sure to create them before hand
-    ssl_certificate /etc/openresty/default.pem;
-    ssl_certificate_key /etc/openresty/default.key;
-
-    ssl_certificate_by_lua_block {
-        require("resty.acme.autossl").ssl_certificate()
-    }
-
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-    }
-}
 ```
 
 ## Manual Request
