@@ -1,13 +1,13 @@
-# irkit-proxy
+# nature-proxy
 
 [![DockerCI][docker-badge]][docker-ci]
 
-[docker-badge]: https://github.com/mkontani/irkit-proxy/workflows/Docker%20Image%20CI/badge.svg
-[docker-ci]: https://github.com/mkontani/irkit-proxy/actions/workflows/docker-image.yml
+[docker-badge]: https://github.com/mkontani/nature-proxy/workflows/Docker%20Image%20CI/badge.svg
+[docker-ci]: https://github.com/mkontani/nature-proxy/actions/workflows/docker-image.yml
 
-- [irkit-proxy](#irkit-proxy)
+- [nature-proxy](#nature-proxy)
   - [Setup](#setup)
-    - [Generate IRKit request payload](#generate-irkit-request-payload)
+    - [Generate nature request payload](#generate-nature-request-payload)
     - [Env setting](#env-setting)
     - [Config setting](#config-setting)
     - [IFTTT Action Setting](#ifttt-action-setting)
@@ -20,15 +20,16 @@
     - [Request with id](#request-with-id)
     - [Request with phrase](#request-with-phrase)
 
-:loud_sound: Simple API tool as IRKit proxy. [IRKit](https://getirkit.com/) is a IoT device as remote controller,
+:loud_sound: Simple API tool as nature proxy. [nature](https://developer.nature.global) is a IoT device as remote controller,
 and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
 
 This proxy addresses following problems:
 
-- IRKit api does not support tlsv1.2, and IFTTT webhook now only supports tlsv1.2 and above.
-So by for now, IFTTT cannot send request to IRkit apis.
+- nature api does not support tlsv1.2, and IFTTT webhook now only supports tlsv1.2 and above.
+So by for now, IFTTT cannot send request to nature apis.
 - IFTTT free plan has became define only 3 custom actions.
 - IFTTT trigger cannot request multiple times all at once.
+- resolve CORS errs for nature apis.
 - schedule(cron) support.
 
 IFTTT action is like below:
@@ -37,16 +38,16 @@ IFTTT action is like below:
 ```plantuml
 @startuml
 SmartSpeakerDevice -> IFTTT: phrase(action and N times)
-IFTTT -> irkitproxy: webhook req
+IFTTT -> natureproxy: webhook req
 group loop N times
-irkitproxy -> IRKitAPI: API req
-IRKitAPI -> irkitproxy: result
+natureproxy -> natureAPI: API req
+natureAPI -> natureproxy: result
 end
-irkitproxy -> IFTTT: summary result
+natureproxy -> IFTTT: summary result
 ...
 group loop N times on schedule
-irkitproxy -> IRKitAPI: API req
-IRKitAPI -> irkitproxy: result
+natureproxy -> natureAPI: API req
+natureAPI -> natureproxy: result
 end
 @enduml
 ```
@@ -59,9 +60,9 @@ so `GoogleHome` is especially suitable.
 
 ## Setup
 
-### Generate IRKit request payload
+### Generate nature request payload
 
-See details: <https://getirkit.com/>
+See details: <https://developer.nature.global>
 
 ### Env setting
 
@@ -72,6 +73,7 @@ Set `APIKEY` with any random value on `.env`.
 ```:sh
 # mandatory
 APIKEY=xxxx
+ACCESS_TOKEN=xxxx
 
 # option
 LOG_LEVEL=info (defult: `warn`)
@@ -94,7 +96,7 @@ TIME_ZONE=Asia/Tokyo
 
 ### Config setting
 
-We should define mappings for `phrase` and `IRkit request payload`.
+We should define mappings for `phrase` and `nature request payload`.
 
 Set `mappings.json` like below:
 
@@ -164,7 +166,7 @@ Use `Make a web request` on `webhook`.
 Set params like below:
 
 ```:sh
-URL: https://<your apihost>/v1/api/irkit
+URL: https://<your apihost>/v1/api/nature
 Method: POST
 Content-type: application/json
 Body: {"apikey": "<your defined value>", "phrase": " {{TextField}}", "repeat": {{NumberField}} }
@@ -185,20 +187,20 @@ $ npm run serve
 $ docker run -d -p 127.0.0.1:8000:8000 --restart always \
     -v $PWD/mappings.json:/app/mappings.json \
     -v $PWD/.env:/app/.env \
-    ghcr.io/mkontani/irkit-proxy:latest
+    ghcr.io/mkontani/nature-proxy:latest
 ```
 
 ## Build
 
 ```sh
 # docker usecase
-$ docker build -t irkit-proxy .
+$ docker build -t nature-proxy .
 
 ## proxy case
-$ docker run -d -p 127.0.0.1:8000:8000 --restart always irkit-proxy
+$ docker run -d -p 127.0.0.1:8000:8000 --restart always nature-proxy
 
 ## standalone case (set env USETLS=true)
-$ docker run -d -p 443:443 --restart always irkit-proxy
+$ docker run -d -p 443:443 --restart always nature-proxy
 ```
 
 ### Proxy example
@@ -231,7 +233,7 @@ server {
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \
     -d '{"apikey": "xxxx", "id": "turn-light", "repeat": 1}' \
-    https://api.nicopun.com/v1/api/irkit
+    https://api.nicopun.com/v1/api/nature
 ```
 
 ### Request with phrase
@@ -239,5 +241,5 @@ server {
 ```:sh
 ᐅ curl -XPOST -H 'content-type: application/json' \
     -d '{"apikey": "xxxx", "phrase": "照明 を 明るく して", "repeat": 2}' \
-    https://api.nicopun.com/v1/api/irkit
+    https://api.nicopun.com/v1/api/nature
 ```
