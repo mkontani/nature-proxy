@@ -1,7 +1,7 @@
 {
-  "name": "irkit-proxy",
-  "version": "1.2.3",
-  "description": "IRKit proxy API server",
+  "name": "nature-proxy",
+  "version": "1.2.4",
+  "description": "Nature proxy API server",
   "main": "index.js",
   "scripts": {
     "serve": "node --tls-min-v1.0 index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkontani/irkit-proxy.git"
+    "url": "git+https://github.com/mkontani/nature-proxy.git"
   },
   "author": "mkontani",
   "license": "ISC",
@@ -17,10 +17,10 @@
     "node": ">= 14.x"
   },
   "bugs": {
-    "url": "https://github.com/mkontani/irkit-proxy/issues",
+    "url": "https://github.com/mkontani/nature-proxy/issues",
     "email": "itoama@live.jp"
   },
-  "homepage": "https://github.com/mkontani/irkit-proxy/blob/master/README.md",
+  "homepage": "https://github.com/mkontani/nature-proxy/blob/master/README.md",
   "dependencies": {
     "axios": "^0.25.0",
     "cron": "^1.8.2",

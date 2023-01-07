@@ -1,28 +1,23 @@
 {
   "rules": [
     {
+      "type": "appliance:LIGHT",
       "id": "turn-light",
+      "appliance_id": "xxxx-xxxx-xxxx-xxxx-xxxxx",
       "words": [
         "照明",
         "つけて"
       ],
-      "payload": "clientkey=xxxx&deviceid=xxxx&message={\"format\":\"raw\",\"freq\":38,\"data\":[20691,10398,...]}"
+      "payload": "button=onoff"
     },
     {
-      "id": "turn-up",
+      "type": "signal",
+      "id": "turn-planetarium",
+      "signal_id": "xxxx-xxxx-xxxx-xxxx-xxxxx",
       "words": [
-        "照明",
-        "明るく"
-      ],
-      "payload": "test1"
-    },
-    {
-      "id": "turn-down",
-      "words": [
-        "照明",
-        "暗く"
-      ],
-      "payload": "test2"
+        "プラネタリウム",
+        "電源"
+      ]
     }
   ],
   "schedules": [
