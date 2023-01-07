@@ -55,7 +55,7 @@ const request = async (use_rule, repeat) => {
     },
   };
 
-  switch (String(use_rule.type).toLowerCase) {
+  switch (String(use_rule.type).toLowerCase()) {
     case "signal":
       options.url = `${base_url}/1/signals/${use_rule.signal_id}/send`;
       break;
