@@ -24,11 +24,9 @@ and [IFTTT](https://ifttt.com/) is a trigger and action service with IoT device.
 
 This proxy addresses following problems:
 
-- nature api does not support tlsv1.2, and IFTTT webhook now only supports tlsv1.2 and above.
-So by for now, IFTTT cannot send request to nature apis.
 - IFTTT free plan has became define only 3 custom actions.
 - IFTTT trigger cannot request multiple times all at once.
-- resolve CORS errs for nature apis.
+- resolve CORS errs (requests by web browser) for nature apis.
 - schedule(cron) support.
 
 IFTTT action is like below:
@@ -36,7 +34,11 @@ IFTTT action is like below:
 <!---
 ```plantuml
 @startuml
+actor Actor
+Actor -> SmartSpeakerDevice
 SmartSpeakerDevice -> IFTTT: phrase(action and N times)
+Actor -> browser: trigger by any api tools
+browser -> natureproxy: proxy req(action and N times)
 IFTTT -> natureproxy: webhook req
 group loop N times
 natureproxy -> natureAPI: API req
@@ -52,7 +54,7 @@ end
 ```
 -->
 
-![image](https://www.plantuml.com/plantuml/svg/hOzD2i8m48NtESKiTM4Fq8LK4A488hONYErWGvDCd2HgRsyi155Skdc4yBsVgNoG7ABHeZ7fqJYK8_8MRwf3MAsXthLjMu8RM7fSo2ueiY1j3mS8og1VYfbueOf75HpJOohXZkU1Q0J6gxWmHGUQo6MJUADpnsclmkPObv1ajkIVxrX67tKGQFlFY3pJHvEkc39N5CMFTY0BlXkmZnh_iQHA4er-0W00)
+![image](https://www.plantuml.com/plantuml/svg/hP31IiGm48RlUOevwi4-G0-o2oBiHOJj2wJjq8PDCd5cujgtDoskLThZ7l87Xk_xC-GWQbbpyCPsIWp7ESsIyFGCvs1Ppmdj1Va5Frs7PZkQmTDhqpGrf96ju4FfSXJ1nXxUG5r0ULmxMwQh8DUWx8O16TgfaEKa1qhanVmGCnojPiR4z3NLi5p0-B7xmBB2nhbYEn9TPiiCJ3c19qeto_nXL_NuVggXn2BzZZRLZ9Az6epzlvhrDoI7O7cwWLLLxQm0546w4VliyLxh74hauBy1)
 
 `Google Assistant` has ingredient util on IFTTT (speaking phrase can be used on next webhook),
 so `GoogleHome` is especially suitable.
@@ -63,11 +65,21 @@ so `GoogleHome` is especially suitable.
 
 See details: <https://developer.nature.global>
 
+```sh
+# get props example
+$ curl -X GET "https://api.nature.global/1/appliances" \
+  -H "accept: application/json" \
+  -H "Authorization: Bearer $TOKEN" | jq | tee remo-appliance.json
+```
+
 ### Env setting
 
 This api is restricted by `apikey` on request body, so you should deploy on tls.
 
 Set `APIKEY` with any random value on `.env`.
+
+`ACCESS_TOKEN` is need for requesting nature-api.
+see <https://home.nature.global/home>
 
 ```:sh
 # mandatory
